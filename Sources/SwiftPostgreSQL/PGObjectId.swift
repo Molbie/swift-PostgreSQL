@@ -19,6 +19,8 @@ public struct PGObjectId: RawRepresentable {
     }
     
     public init?(rawValue: Oid) {
+        PGObjectId.updateCache()
+        
         if let cache = PGObjectId._cache[rawValue] {
             self = cache
         }
@@ -29,6 +31,32 @@ public struct PGObjectId: RawRepresentable {
             print("Unhandled OID: \(rawValue)")
             return nil
         }
+    }
+    
+    // NOTE: preload static variables in order to do a lookup by Oid
+    private static var cacheLoaded = false
+    private static func updateCache() {
+        guard !cacheLoaded else { return }
+        cacheLoaded = true
+        
+        let _ = numericTypes
+        let _ = monetaryTypes
+        let _ = characterTypes
+        let _ = binaryDataTypes
+        let _ = dateTimeTypes
+        let _ = booleanTypes
+        let _ = geometricTypes
+        let _ = networkTypes
+        let _ = bitStringTypes
+        let _ = textSearchTypes
+        let _ = uuidTypes
+        let _ = xmlTypes
+        let _ = jsonTypes
+        let _ = objectIdTypes
+        let _ = lsnTypes
+        let _ = pseudoTypes
+        let _ = aclTypes
+        let _ = otherTypes
     }
 }
 
@@ -56,6 +84,29 @@ public extension PGObjectId {
     public static let smallIntegerArray =               PGObjectId(rawValue: 01_005, name: "_int2", description: "array of -32 thousand to 32 thousand, 2-byte storage")
     public static let smallIntegerVector =              PGObjectId(rawValue: 00_022, name: "int2vector", description: "array of int2, used in system tables")
     public static let smallIntegerVectorArray =         PGObjectId(rawValue: 01_006, name: "_int2vector", description: "array of array of int2, used in system tables")
+    
+    private static var numericTypes: [PGObjectId] {
+        return [.bigInteger,
+                .bigIntegerArray,
+                .bigIntegerRange,
+                .bigIntegerRangeArray,
+                .double,
+                .doubleArray,
+                .integer,
+                .integerArray,
+                .integerRange,
+                .integerRangeArray,
+                .numeric,
+                .numericArray,
+                .numericRange,
+                .numericRangeArray,
+                .real,
+                .realArray,
+                .smallInteger,
+                .smallIntegerArray,
+                .smallIntegerVector,
+                .smallIntegerVectorArray]
+    }
 }
 
 // MARK: -
@@ -64,6 +115,11 @@ public extension PGObjectId {
 public extension PGObjectId {
     public static let money =                           PGObjectId(rawValue: 00_790, name: "money", description: "monetary amounts, $d,ddd.cc")
     public static let moneyArray =                      PGObjectId(rawValue: 00_791, name: "_money", description: "array of monetary amounts, $d,ddd.cc")
+    
+    private static var monetaryTypes: [PGObjectId] {
+        return [.money,
+                .moneyArray]
+    }
 }
 
 // MARK: -
@@ -80,6 +136,19 @@ public extension PGObjectId {
     public static let textArray =                       PGObjectId(rawValue: 01_009, name: "_text", description: "array of variable-length string, no limit specified")
     public static let variableCharacter =               PGObjectId(rawValue: 01_043, name: "varchar", description: "varchar(length), non-blank-padded string, variable storage length")
     public static let variableCharacterArray =          PGObjectId(rawValue: 01_015, name: "_varchar", description: "array of varchar(length), non-blank-padded string, variable storage length")
+    
+    private static var characterTypes: [PGObjectId] {
+        return [.character,
+                .characterArray,
+                .name,
+                .nameArray,
+                .paddedCharacter,
+                .paddedCharacterArray,
+                .text,
+                .textArray,
+                .variableCharacter,
+                .variableCharacterArray]
+    }
 }
 
 // MARK: -
@@ -88,6 +157,11 @@ public extension PGObjectId {
 public extension PGObjectId {
     public static let byteArray =                       PGObjectId(rawValue: 00_017, name: "bytea", description: "variable-length string, binary values escaped")
     public static let byteArrayArray =                  PGObjectId(rawValue: 01_001, name: "_bytea", description: "array of variable-length string, binary values escaped")
+    
+    private static var binaryDataTypes: [PGObjectId] {
+        return [.byteArray,
+                .byteArrayArray]
+    }
 }
 
 // MARK: -
@@ -118,6 +192,33 @@ public extension PGObjectId {
     public static let unixTimeArray =                   PGObjectId(rawValue: 01_023, name: "_abstime", description: "array of absolute, limited-range date and time (Unix system time)")
     public static let unixTimeOffset =                  PGObjectId(rawValue: 00_703, name: "reltime", description: "relative, limited-range time interval (Unix delta time)")
     public static let unixTimeOffsetArray =             PGObjectId(rawValue: 01_024, name: "_reltime", description: "array of relative, limited-range time interval (Unix delta time)")
+    
+    private static var dateTimeTypes: [PGObjectId] {
+        return [.date,
+                .dateArray,
+                .dateRange,
+                .dateRangeArray,
+                .interval,
+                .intervalArray,
+                .time,
+                .timeArray,
+                .timeInterval,
+                .timeIntervalArray,
+                .timestamp,
+                .timestampArray,
+                .timestampRange,
+                .timestampRangeArray,
+                .timestampWithTimezone,
+                .timestampWithTimezoneArray,
+                .timestampWithTimezoneRange,
+                .timestampWithTimezoneRangeArray,
+                .timeWithTimezone,
+                .timeWithTimezoneArray,
+                .unixTime,
+                .unixTimeArray,
+                .unixTimeOffset,
+                .unixTimeOffsetArray]
+    }
 }
 
 // MARK: -
@@ -126,6 +227,11 @@ public extension PGObjectId {
 public extension PGObjectId {
     public static let boolean =                         PGObjectId(rawValue: 00_016, name: "bool", description: "boolean, 'true'/'false'")
     public static let booleanArray =                    PGObjectId(rawValue: 01_000, name: "_bool", description: "array of boolean, 'true'/'false'")
+    
+    private static var booleanTypes: [PGObjectId] {
+        return [.boolean,
+                .booleanArray]
+    }
 }
 
 // MARK: -
@@ -146,6 +252,23 @@ public extension PGObjectId {
     public static let pointArray =                      PGObjectId(rawValue: 01_017, name: "_point", description: "array of geometric point '(x, y)'")
     public static let polygon =                         PGObjectId(rawValue: 00_604, name: "polygon", description: "geometric polygon '(pt1,...)'")
     public static let polygonArray =                    PGObjectId(rawValue: 01_027, name: "_polygon", description: "array of geometric polygon '(pt1,...)'")
+    
+    private static var geometricTypes: [PGObjectId] {
+        return [.box,
+                .boxArray,
+                .circle,
+                .circleArray,
+                .line,
+                .lineArray,
+                .lineSegment,
+                .lineSegmentArray,
+                .path,
+                .pathArray,
+                .point,
+                .pointArray,
+                .polygon,
+                .polygonArray]
+    }
 }
 
 // MARK: -
@@ -160,6 +283,17 @@ public extension PGObjectId {
     public static let ipv4MacAddressArray =             PGObjectId(rawValue: 01_040, name: "_macaddr", description: "array of XX:XX:XX:XX:XX:XX, MAC address")
     public static let ipv6MacAddress =                  PGObjectId(rawValue: 00_774, name: "macaddr8", description: "XX:XX:XX:XX:XX:XX:XX:XX, MAC address")
     public static let ipv6MacAddressArray =             PGObjectId(rawValue: 00_775, name: "_macaddr8", description: "array of XX:XX:XX:XX:XX:XX:XX:XX, MAC address")
+    
+    private static var networkTypes: [PGObjectId] {
+        return [.cidr,
+                .cidrArray,
+                .ipAddress,
+                .ipAddressArray,
+                .ipv4MacAddress,
+                .ipv4MacAddressArray,
+                .ipv6MacAddress,
+                .ipv6MacAddressArray]
+    }
 }
 
 // MARK: -
@@ -170,6 +304,13 @@ public extension PGObjectId {
     public static let bitStringArray =                  PGObjectId(rawValue: 01_561, name: "_bit", description: "array of fixed-length bit string")
     public static let variableBitString =               PGObjectId(rawValue: 01_562, name: "varbit", description: "variable-length bit string")
     public static let variableBitStringArray =          PGObjectId(rawValue: 01_563, name: "_varbit", description: "array of variable-length bit string")
+    
+    private static var bitStringTypes: [PGObjectId] {
+        return [.bitString,
+                .bitStringArray,
+                .variableBitString,
+                .variableBitStringArray]
+    }
 }
 
 // MARK: -
@@ -182,6 +323,15 @@ public extension PGObjectId {
     public static let textSearchVectorArray =           PGObjectId(rawValue: 03_643, name: "_tsvector", description: "array of text representation for text search")
     public static let textSearchVectorGist =            PGObjectId(rawValue: 03_642, name: "gtsvector", description: "GiST index internal text representation for text search")
     public static let textSearchVectorGistArray =       PGObjectId(rawValue: 03_644, name: "_gtsvector", description: "array of GiST index internal text representation for text search")
+    
+    private static var textSearchTypes: [PGObjectId] {
+        return [.textSearchQuery,
+                .textSearchQueryArray,
+                .textSearchVector,
+                .textSearchVectorArray,
+                .textSearchVectorGist,
+                .textSearchVectorGistArray]
+    }
 }
 
 // MARK: -
@@ -190,6 +340,11 @@ public extension PGObjectId {
 public extension PGObjectId {
     public static let uuid =                            PGObjectId(rawValue: 02_950, name: "uuid", description: "UUID datatype")
     public static let uuidArray =                       PGObjectId(rawValue: 02_951, name: "_uuid", description: "array of UUID datatype")
+    
+    private static var uuidTypes: [PGObjectId] {
+        return [.uuid,
+                .uuidArray]
+    }
 }
 
 // MARK: -
@@ -198,6 +353,11 @@ public extension PGObjectId {
 public extension PGObjectId {
     public static let xml =                             PGObjectId(rawValue: 00_142, name: "xml", description: "XML content")
     public static let xmlArray =                        PGObjectId(rawValue: 00_143, name: "_xml", description: "array of XML content")
+    
+    private static var xmlTypes: [PGObjectId] {
+        return [.xml,
+                .xmlArray]
+    }
 }
 
 // MARK: -
@@ -208,6 +368,13 @@ public extension PGObjectId {
     public static let jsonArray =                       PGObjectId(rawValue: 00_199, name: "_json", description: "array of JSON content")
     public static let jsonBinary =                      PGObjectId(rawValue: 03_802, name: "jsonb", description: "Binary JSON")
     public static let jsonBinaryArray =                 PGObjectId(rawValue: 03_807, name: "_jsonb", description: "array of Binary JSON")
+    
+    private static var jsonTypes: [PGObjectId] {
+        return [.json,
+                .jsonArray,
+                .jsonBinary,
+                .jsonBinaryArray]
+    }
 }
 
 // MARK: -
@@ -246,6 +413,41 @@ public extension PGObjectId {
     public static let tupleIdArray =                    PGObjectId(rawValue: 01_010, name: "_tid", description: "array of (block, offset), physical location of tuple")
     public static let type =                            PGObjectId(rawValue: 02_206, name: "regtype", description: "registered type")
     public static let typeArray =                       PGObjectId(rawValue: 02_211, name: "_regtype", description: "array of registered type")
+    
+    private static var objectIdTypes: [PGObjectId] {
+        return [.class,
+                .classArray,
+                .commandId,
+                .commandIdArray,
+                .namespace,
+                .namespaceArray,
+                .objectId,
+                .objectIdArray,
+                .objectIdVector,
+                .objectIdVectorArray,
+                .operator,
+                .operatorArray,
+                .operatorWithArguments,
+                .operatorWithArgumentsArray,
+                .procedure,
+                .procedureArray,
+                .procedureWithArguments,
+                .procedureWithArgumentsArray,
+                .role,
+                .roleArray,
+                .textSearchConfiguration,
+                .textSearchConfigurationArray,
+                .textSearchDictionary,
+                .textSearchDictionaryArray,
+                .transactionId,
+                .transactionIdArray,
+                .transactionIdSnapshot,
+                .transactionIdSnapshotArray,
+                .tupleId,
+                .tupleIdArray,
+                .type,
+                .typeArray]
+    }
 }
 
 // MARK: -
@@ -254,6 +456,11 @@ public extension PGObjectId {
 public extension PGObjectId {
     public static let logSequenceNumber =               PGObjectId(rawValue: 03_220, name: "pg_lsn", description: "PostgreSQL LSN datatype")
     public static let logSequenceNumberArray =          PGObjectId(rawValue: 03_221, name: "_pg_lsn", description: "array of PostgreSQL LSN datatype")
+    
+    private static var lsnTypes: [PGObjectId] {
+        return [.logSequenceNumber,
+                .logSequenceNumberArray]
+    }
 }
 
 // MARK: -
@@ -281,6 +488,30 @@ public extension PGObjectId {
     public static let trigger =                         PGObjectId(rawValue: 02_279, name: "trigger", description: "trigger")
     public static let unknown =                         PGObjectId(rawValue: 00_705, name: "unknown", description: "unknown")
     public static let void =                            PGObjectId(rawValue: 02_278, name: "void", description: "void")
+    
+    private static var pseudoTypes: [PGObjectId] {
+        return [.any,
+                .anyArray,
+                .anyElement,
+                .anyEnum,
+                .anyNonArray,
+                .anyRange,
+                .collectedCommand,
+                .cString,
+                .cStringArray,
+                .eventTrigger,
+                .foreignDataWrapperHandler,
+                .indexAccessMethodHandler,
+                .internal,
+                .languageHandler,
+                .opaque,
+                .record,
+                .recordArray,
+                .tableSampleMethodHandler,
+                .trigger,
+                .unknown,
+                .void]
+    }
 }
 
 // MARK: -
@@ -289,6 +520,11 @@ public extension PGObjectId {
 public extension PGObjectId {
     public static let aclItem =                         PGObjectId(rawValue: 01_033, name: "aclitem", description: "access control list")
     public static let aclItemArray =                    PGObjectId(rawValue: 01_034, name: "_aclitem", description: "array of access control list")
+    
+    private static var aclTypes: [PGObjectId] {
+        return [.aclItem,
+                .aclItemArray]
+    }
 }
 
 // MARK: -
@@ -301,6 +537,15 @@ public extension PGObjectId {
     public static let ndistinctCoefficients =           PGObjectId(rawValue: 03_361, name: "pg_ndistinct", description: "multivariate ndistinct coefficients")
     public static let nodeTree =                        PGObjectId(rawValue: 00_194, name: "pg_node_tree", description: "string representing an internal node tree")
     public static let storageManager =                  PGObjectId(rawValue: 00_210, name: "smgr", description: "storage manager")
+    
+    private static var otherTypes: [PGObjectId] {
+        return [.cursor,
+                .cursorArray,
+                .dependencies,
+                .ndistinctCoefficients,
+                .nodeTree,
+                .storageManager]
+    }
 }
 
 // MARK: -
