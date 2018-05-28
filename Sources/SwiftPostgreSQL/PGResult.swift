@@ -53,7 +53,7 @@ public final class PGResult {
     // MARK: -
     // MARK: Rows
     
-    public lazy var rowCount: Int = {
+    public lazy var count: Int = {
         guard let result = rawResult else { return 0 }
         
         return Int(PQntuples(result))

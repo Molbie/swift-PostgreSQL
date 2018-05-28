@@ -12,7 +12,7 @@ public final class PGResultIterator: IteratorProtocol {
     
     public func next() -> PGRow? {
         guard let result = result else { return nil }
-        guard current < result.rowCount else { return nil }
+        guard current < result.count else { return nil }
         
         let row = current
         current += 1
