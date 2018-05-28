@@ -13,6 +13,16 @@ public final class PGField {
         self.id = Int32(id)
     }
     
+    public var name: String? {
+        guard let result = result else { return nil }
+        return result.metadata[Int(id)].name
+    }
+    
+    public var objectId: PGObjectId? {
+        guard let result = result else { return nil }
+        return result.metadata[Int(id)].objectId
+    }
+    
     public var isNull: Bool {
         guard let rawResult = result?.rawResult else { return true }
         

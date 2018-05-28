@@ -19,7 +19,7 @@ public final class PGFieldMetadata {
         return value
     }
     
-    public var type: PGObjectId? {
+    public var objectId: PGObjectId? {
         guard let rawResult = result?.rawResult else { return nil }
         let rawType = PQftype(rawResult, field)
         
