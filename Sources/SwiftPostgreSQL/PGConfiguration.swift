@@ -7,6 +7,7 @@ public struct PGConfiguration {
     public let port: Int?
     public let username: String?
     public let password: String?
+    public let schema: String?
     
     public var connectionInfo: String {
         var result = "host=\(host) dbname=\(database)"
@@ -22,11 +23,12 @@ public struct PGConfiguration {
         return result
     }
     
-    public init(database: String, host: String, port: Int? = nil, username: String? = nil, password: String? = nil) {
+    public init(database: String, host: String, port: Int? = nil, username: String? = nil, password: String? = nil, schema: String? = nil) {
         self.database = database
         self.host = host
         self.port = port
         self.username = username
         self.password = password
+        self.schema = schema
     }
 }
