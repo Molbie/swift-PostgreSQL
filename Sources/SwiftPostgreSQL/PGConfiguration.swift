@@ -2,11 +2,11 @@ import Foundation
 
 
 public struct PGConfiguration {
-    private let database: String
-    private let host: String
-    private let port: Int?
-    private let username: String?
-    private let password: String?
+    public let database: String
+    public let host: String
+    public let port: Int?
+    public let username: String?
+    public let password: String?
     
     public var connectionInfo: String {
         var result = "host=\(host) dbname=\(database)"
