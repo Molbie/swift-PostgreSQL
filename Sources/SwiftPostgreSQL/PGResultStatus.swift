@@ -37,3 +37,23 @@ public extension PGResultStatus {
         }
     }
 }
+
+extension PGResultStatus: Equatable {
+    public static func == (lhs: PGResultStatus, rhs: PGResultStatus) -> Bool {
+        switch (lhs, rhs) {
+            case (.noResult, .noResult),
+                 (.emptyQuery, .emptyQuery),
+                 (.commandOK, .commandOK),
+                 (.tuplesOK, .tuplesOK),
+                 (.badResponse, .badResponse),
+                 (.nonFatalError, .nonFatalError),
+                 (.fatalError, .fatalError),
+                 (.singleTuple, .singleTuple):
+                return true
+            case let (.unknown(lhsCode), .unknown(rhsCode)):
+                return lhsCode == rhsCode
+            default:
+                return false
+        }
+    }
+}
