@@ -62,7 +62,7 @@ public final class PGConnection {
             case .emptyQuery, .commandOK, .tuplesOK:
                 return result
             case .badResponse, .nonFatalError, .fatalError, .singleTuple, .unknown, .noResult:
-                throw PGError.executeStatement(status)
+                throw PGError.executeStatement(status, errorMessage)
         }
     }
     

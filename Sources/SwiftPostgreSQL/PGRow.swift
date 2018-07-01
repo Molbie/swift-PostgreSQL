@@ -24,7 +24,8 @@ public final class PGRow {
     }
     
     public subscript(name: String) -> PGField? {
-        guard let index = result?.metadata.index(where: { $0.name == name }) else { return nil }
+        let lowercaseName = name.lowercased()
+        guard let index = result?.metadata.index(where: { $0.name?.lowercased() == lowercaseName }) else { return nil }
         
         return self[index]
     }
