@@ -4,7 +4,7 @@
 import PackageDescription
 
 
-let useBrew = false
+let useBrew = true
 let libpqUrl: String
 #if os(macOS)
     if useBrew {
