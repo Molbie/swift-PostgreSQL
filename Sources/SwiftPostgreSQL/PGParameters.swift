@@ -1,5 +1,5 @@
 import Foundation
-import libpq
+import CPostgreSQL
 
 
 public final class PGParameters {
@@ -40,19 +40,19 @@ public final class PGParameters {
                 var terminatedValue = [UInt8](value.utf8)
                 terminatedValue.append(0)
                 rawBytes.append(terminatedValue)
-                values[index] = UnsafePointer<Int8>(OpaquePointer(rawBytes.last!))
+                values[index] = rawBytes.last!.ccPointer
                 types[index] = 0
                 lengths[index] = 0
                 formats[index] = 0
             case let value as [UInt8]:
                 let length = Int32(value.count)
-                values[index] = UnsafePointer<Int8>(OpaquePointer(value))
+                values[index] = value.ccPointer
                 types[index] = 17
                 lengths[index] = length
                 formats[index] = 1
             case let value as [Int8]:
                 let length = Int32(value.count)
-                values[index] = UnsafePointer<Int8>(OpaquePointer(value))
+                values[index] = value.pointer
                 types[index] = 17
                 lengths[index] = length
                 formats[index] = 1
@@ -60,7 +60,7 @@ public final class PGParameters {
                 let bytes = value.map { $0 }
                 let length = Int32(bytes.count)
                 rawBytes.append(bytes)
-                values[index] = UnsafePointer<Int8>(OpaquePointer(rawBytes.last!))
+                values[index] = rawBytes.last!.ccPointer
                 types[index] = 17
                 lengths[index] = length
                 formats[index] = 1
@@ -70,7 +70,7 @@ public final class PGParameters {
                     var terminatedValue = [UInt8](rawValues.last!.utf8)
                     terminatedValue.append(0)
                     rawBytes.append(terminatedValue)
-                    values[index] = UnsafePointer<Int8>(OpaquePointer(rawBytes.last!))
+                    values[index] = rawBytes.last!.ccPointer 
                 }
                 else {
                     values[index] = nil
@@ -80,5 +80,19 @@ public final class PGParameters {
                 formats[index] = 0
             }
         }
+    }
+}
+
+fileprivate extension Array where Element == UInt8 {
+    var ccPointer: UnsafePointer<Int8>? {
+        return withUnsafeBufferPointer { buffered -> UnsafePointer<Int8>? in
+            return buffered.baseAddress?.withMemoryRebound(to: Int8.self, capacity: count) { $0 }
+        }
+    }
+}
+
+fileprivate extension Array where Element == Int8 {
+    var pointer: UnsafePointer<Int8>? {
+        return withUnsafeBufferPointer { $0.baseAddress }
     }
 }

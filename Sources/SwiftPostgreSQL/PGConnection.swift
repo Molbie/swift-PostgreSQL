@@ -1,5 +1,5 @@
 import Foundation
-import libpq
+import CPostgreSQL
 
 
 public final class PGConnection {

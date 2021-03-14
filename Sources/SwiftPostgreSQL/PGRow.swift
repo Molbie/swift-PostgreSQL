@@ -1,5 +1,5 @@
 import Foundation
-import libpq
+import CPostgreSQL
 
 
 public final class PGRow {
@@ -25,7 +25,7 @@ public final class PGRow {
     
     public subscript(name: String) -> PGField? {
         let lowercaseName = name.lowercased()
-        guard let index = result?.metadata.index(where: { $0.name?.lowercased() == lowercaseName }) else { return nil }
+        guard let index = result?.metadata.firstIndex(where: { $0.name?.lowercased() == lowercaseName }) else { return nil }
         
         return self[index]
     }
